@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SelectSpeak.Tests/SelectSpeak.Tests.csproj" />
+  <Project Path="SelectSpeak/SelectSpeak.csproj" />
+</Solution>
