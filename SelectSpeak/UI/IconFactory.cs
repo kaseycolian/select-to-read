@@ -26,7 +26,7 @@ internal static class IconFactory
             // Local bounds x[0..12] y[3..19] → center (6, 11); max reach from center ≈ 10.
             var state = g.Save();
             g.TranslateTransform(16f, 16f);
-            g.ScaleTransform(1.12f, 1.12f);
+            g.ScaleTransform(0.92f, 0.92f);
             g.TranslateTransform(-6f, -11f);
 
             using (var pink = new SolidBrush(p.AccentPinkColor))
