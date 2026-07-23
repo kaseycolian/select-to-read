@@ -21,6 +21,15 @@ if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     throw "The .NET SDK ('dotnet') was not found. Install .NET 10 from https://dotnet.microsoft.com/download then re-run."
 }
 
+# Close any running instance first — a running SelectSpeak.exe is locked, so the build can't
+# overwrite it and you'd silently keep the old build (and old icon).
+$running = Get-Process -Name SelectSpeak -ErrorAction SilentlyContinue
+if ($running) {
+    Write-Host 'Closing the running SelectSpeak so it can be rebuilt...' -ForegroundColor Yellow
+    $running | Stop-Process -Force -ErrorAction SilentlyContinue
+    Start-Sleep -Milliseconds 500
+}
+
 Write-Host 'Building SelectSpeak (first build can take a minute)...' -ForegroundColor Cyan
 dotnet publish $proj -c Release -p:PublishSingleFile=true --self-contained true -r win-x64 | Out-Null
 
@@ -47,6 +56,10 @@ if ($StartWithWindows) {
     Write-Host 'SelectSpeak will now also start automatically when you sign in.' -ForegroundColor Green
 }
 
+# Nudge Windows to rebuild the icon cache so the new icon shows without a sign-out.
+try { & ie4uinit.exe -show } catch {}
+
 Write-Host ''
 Write-Host 'Done! Double-click the Desktop icon to start SelectSpeak.' -ForegroundColor Green
 Write-Host 'Select text anywhere, then press Ctrl+Alt+S to read it. Right-click the tray icon for Settings.' -ForegroundColor Green
+Write-Host 'If a taskbar/Start pin still shows the old icon, unpin and re-pin it (Windows caches pinned icons).' -ForegroundColor DarkGray
