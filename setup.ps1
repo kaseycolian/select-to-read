@@ -36,13 +36,22 @@ dotnet publish $proj -c Release -p:PublishSingleFile=true --self-contained true 
 $exe = Join-Path $root 'SelectSpeak\bin\Release\net10.0-windows10.0.19041.0\win-x64\publish\SelectSpeak.exe'
 if (-not (Test-Path $exe)) { throw "Build finished but the exe was not found at:`n$exe" }
 
+# Windows caches shortcut icons by their source path, so pointing at "$exe,0" keeps showing the
+# OLD icon even after a rebuild. Copy the icon to a uniquely-named file each run so the shortcut
+# references a path Windows has never cached — guaranteeing the current icon shows.
+$iconSrc = Join-Path $root 'SelectSpeak\appicon.ico'
+$iconDir = Split-Path $exe
+Get-ChildItem $iconDir -Filter 'SelectSpeak.icon-*.ico' -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+$iconFile = Join-Path $iconDir ('SelectSpeak.icon-{0}.ico' -f (Get-Date -Format 'yyyyMMddHHmmss'))
+Copy-Item $iconSrc $iconFile -Force
+
 function New-Shortcut([string]$LinkPath) {
     $shell = New-Object -ComObject WScript.Shell
     $sc = $shell.CreateShortcut($LinkPath)
     $sc.TargetPath = $exe
     $sc.WorkingDirectory = Split-Path $exe
     $sc.Description = 'SelectSpeak - select text anywhere and have it read aloud'
-    $sc.IconLocation = "$exe,0"
+    $sc.IconLocation = "$iconFile,0"
     $sc.Save()
 }
 
