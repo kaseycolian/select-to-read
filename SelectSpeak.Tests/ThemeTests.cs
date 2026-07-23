@@ -50,8 +50,22 @@ public class ThemeTests
     {
         var json = System.Text.Json.JsonSerializer.Serialize(BuiltInThemes.Dark.Palette);
         Assert.Contains("Background", json);
-        Assert.Contains("#0D0B1A", json);
+        Assert.Contains("#070110", json); // Rink Classic Dark background
         Assert.DoesNotContain("BackgroundColor", json); // [JsonIgnore] getters excluded
+    }
+
+    [Fact]
+    public void BuiltInThemes_AreTheTenBrandThemes_AllValidAndUnique()
+    {
+        Assert.Equal(10, BuiltInThemes.All.Count);
+        Assert.All(BuiltInThemes.All, t =>
+        {
+            Assert.True(t.IsBuiltIn);
+            Assert.True(t.Palette.IsValid(out var error), $"{t.Name}: {error}");
+        });
+        // Names are distinct (they key persistence + the selector).
+        Assert.Equal(BuiltInThemes.All.Count, BuiltInThemes.All.Select(t => t.Name).Distinct().Count());
+        Assert.Equal(BuiltInThemes.DarkName, BuiltInThemes.DefaultThemeName);
     }
 
     [Fact]
@@ -59,10 +73,11 @@ public class ThemeTests
     {
         var settings = new Settings();
         var svc = new ThemeService(settings, () => { });
-        Assert.Equal(2, svc.AllThemes().Count);
+        int builtInCount = BuiltInThemes.All.Count;
+        Assert.Equal(builtInCount, svc.AllThemes().Count);
 
         Assert.True(svc.AddOrUpdateCustom("Cosmic", new ThemePalette(), out _));
-        Assert.Equal(3, svc.AllThemes().Count);
+        Assert.Equal(builtInCount + 1, svc.AllThemes().Count);
         Assert.Contains(svc.AllThemes(), t => t.Name == "Cosmic");
     }
 
