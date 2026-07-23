@@ -10,6 +10,7 @@
     <RootNamespace>SelectSpeak</RootNamespace>
     <AssemblyName>SelectSpeak</AssemblyName>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationIcon>appicon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
