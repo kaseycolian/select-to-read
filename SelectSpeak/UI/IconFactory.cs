@@ -14,18 +14,19 @@ internal static class IconFactory
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.Clear(Color.Transparent);
 
-            // Dark background circle with a neon-pink ring.
+            // Dark background circle with a neon-pink ring (ring pushed near the edge so the
+            // speaker has room without touching it).
             using (var bg = new SolidBrush(p.BackgroundColor))
-                g.FillEllipse(bg, 1, 1, 30, 30);
+                g.FillEllipse(bg, 0, 0, 31, 31);
             using (var ring = new Pen(p.AccentPinkColor, 2f))
-                g.DrawEllipse(ring, 2, 2, 27, 27);
+                g.DrawEllipse(ring, 1.5f, 1.5f, 28, 28);
 
-            // Neon-pink speaker, centered on its own bounds so the solid mass sits dead-center
-            // and scaled up to nearly fill the circle while staying clear of the ring.
-            // Local bounds x[0..12] y[3..19] → center (6, 11).
+            // Neon-pink speaker, centered on its own bounds so the solid mass sits dead-center,
+            // scaled up but leaving clear padding inside the ring.
+            // Local bounds x[0..12] y[3..19] → center (6, 11); max reach from center ≈ 10.
             var state = g.Save();
             g.TranslateTransform(16f, 16f);
-            g.ScaleTransform(1.35f, 1.35f);
+            g.ScaleTransform(1.12f, 1.12f);
             g.TranslateTransform(-6f, -11f);
 
             using (var pink = new SolidBrush(p.AccentPinkColor))
